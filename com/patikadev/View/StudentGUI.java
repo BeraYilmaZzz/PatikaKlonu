@@ -52,9 +52,7 @@ public class StudentGUI extends JFrame{
         setVisible(true);
 
         lbl_welcome.setText("Welcome" + student.getName());
-        //CourseRegisterModel
         mdl_student_course_register_list = new DefaultTableModel(){
-            //Bu metod sayesinde tablomuzdaki ID ve Course Name degerlerinde tablo uzarinden degisiklik yapilamaz
             @Override
             public boolean isCellEditable(int row, int column) {
                 if ((column == 0) || (column == 1))
@@ -73,7 +71,6 @@ public class StudentGUI extends JFrame{
         tbl_student_course_register.getColumnModel().getColumn(0).setMinWidth(25);
         tbl_student_course_register.getTableHeader().setReorderingAllowed(false);
 
-        //TABLODA TIKLADIGIMIZ YERIN ID DEGERINI SILME ISLEMININ YAPILDIGI KUTUCUGA YAZDIRDIGIMIZ METOD
         tbl_student_course_register.getSelectionModel().addListSelectionListener(e -> {
             try {
                 String selected_row = tbl_student_course_register.getValueAt(tbl_student_course_register.getSelectedRow() , 0).toString();
@@ -81,11 +78,10 @@ public class StudentGUI extends JFrame{
             }catch (Exception ex){
             }
         });
-        //####CourseRegisterModel
+        //CourseRegisterModel---
 
         //CourseContentsModel
         mdl_student_course_contents_list = new DefaultTableModel(){
-            //Bu metod sayesinde tablomuzdaki ID ve Course Name degerlerinde tablo uzarinden degisiklik yapilamaz
             @Override
             public boolean isCellEditable(int row, int column) {
                 if ((column == 0) || (column == 1))
@@ -105,7 +101,6 @@ public class StudentGUI extends JFrame{
         tbl_student_course_contents.getColumnModel().getColumn(0).setMinWidth(25);
         tbl_student_course_contents.getTableHeader().setReorderingAllowed(false);
 
-        //TABLODA TIKLADIGIMIZ YERIN ID DEGERINI SILME ISLEMININ YAPILDIGI KUTUCUGA YAZDIRDIGIMIZ METOD
         tbl_student_course_contents.getSelectionModel().addListSelectionListener(e -> {
             try {
                 String selected_row = tbl_student_course_contents.getValueAt(tbl_student_course_contents.getSelectedRow() , 0).toString();
@@ -113,7 +108,7 @@ public class StudentGUI extends JFrame{
             }catch (Exception ex){
             }
         });
-        //####CourseContentsModel
+        //CourseContentsModel---
 
 
 
@@ -230,7 +225,6 @@ public class StudentGUI extends JFrame{
         clearModel.setRowCount(0);
         int i;
         for (StudentCourseContents obj : StudentCourseContents.getList()){
-            //"ID"  , "Course Name" , "Contents Title", "Contents Questions" , "Student Answer" , "Student Comment"
             i = 0;
             row_student_course_contents_list[i++] = obj.getId();
             row_student_course_contents_list[i++] = Course.getFetch(obj.getCourse_id()).getName();
@@ -285,7 +279,4 @@ public class StudentGUI extends JFrame{
         }
 
     }
-
-
-
 }
