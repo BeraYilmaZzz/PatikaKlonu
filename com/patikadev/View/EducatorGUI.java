@@ -66,7 +66,6 @@ public class EducatorGUI extends JFrame{
 
         //ContentsModel
         mdl_contents_list = new DefaultTableModel(){
-            //Bu metod sayesinde tablomuzdaki ID ve Course Name degerlerinde tablo uzarinden degisiklik yapilamaz
             @Override
             public boolean isCellEditable(int row, int column) {
                 if ((column == 0) || (column == 1))
@@ -84,7 +83,6 @@ public class EducatorGUI extends JFrame{
         tbl_contents_list.getColumnModel().getColumn(0).setMinWidth(20);
         tbl_contents_list.getTableHeader().setReorderingAllowed(false);
 
-        //TABLODA TIKLADIGIMIZ YERIN ID DEGERINI SILME ISLEMININ YAPILDIGI KUTUCUGA YAZDIRDIGIMIZ METOD
         tbl_contents_list.getSelectionModel().addListSelectionListener(e -> {
             try {
                 String selected_row = tbl_contents_list.getValueAt(tbl_contents_list.getSelectedRow() , 0).toString();
@@ -121,7 +119,6 @@ public class EducatorGUI extends JFrame{
 
         //QuizModel
         mdl_quiz_list = new DefaultTableModel(){
-            //Bu metod sayesinde tablomuzdaki ID ve Course Name degerlerinde tablo uzarinden degisiklik yapilamaz
             @Override
             public boolean isCellEditable(int row, int column) {
                 if ((column == 0) || (column == 1) || (column == 2))
@@ -158,7 +155,6 @@ public class EducatorGUI extends JFrame{
             }
         });
 
-        //TABLODA TIKLADIGIMIZ YERIN ID DEGERINI SILME ISLEMININ YAPILDIGI KUTUCUGA YAZDIRDIGIMIZ METOD
         tbl_quiz_list.getSelectionModel().addListSelectionListener(e -> {
             try {
                 String selected_row = tbl_quiz_list.getValueAt(tbl_quiz_list.getSelectedRow() , 0).toString();
@@ -168,10 +164,7 @@ public class EducatorGUI extends JFrame{
         });
 
         //QuizModel###
-
-
-
-
+        
         btn_logout.addActionListener(e -> {
             dispose();
             LoginGUI loginGUI = new LoginGUI();
@@ -290,8 +283,6 @@ public class EducatorGUI extends JFrame{
             mdl_quiz_list.addRow(row_quiz_list);
         }
     }
-
-    //VERITABANINDAKI OBJELERI TABLOYA CEKME METODU
     private void loadContentsModel() {
         DefaultTableModel clearModel = (DefaultTableModel) tbl_contents_list.getModel();
         clearModel.setRowCount(0);
