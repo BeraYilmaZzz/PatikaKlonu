@@ -16,7 +16,6 @@ public class Patika {
         this.id = id;
         this.name = name;
     }
-    //Nesne uretbilmek icin bos bir kurucu metod olusturdum --> overloading
     public Patika(){}
 
     public int getId() {
@@ -45,12 +44,6 @@ public class Patika {
             while (resultSet.next()){
                 obj = new Patika(resultSet.getInt("id") , resultSet.getNString("name"));
                 patikaList.add(obj);
-                /*
-                obj1 = new Patika();  //bunu olusturabilmek icin Patika class icinde bos bir Consructor olusturmak lazim
-                obj.setId(resultSet.getInt("id"));
-                obj.setName(resultSet.getString("name"));
-                patikaList.add(obj1);
-                */
             }
         } catch (SQLException e) {
             System.out.println(e.getMessage());
