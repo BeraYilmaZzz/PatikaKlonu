@@ -37,7 +37,6 @@ public class Patika {
     public static ArrayList<Patika> getList(){
         ArrayList<Patika> patikaList = new ArrayList<>();
         Patika obj;
-        //Patika obj1;
         try {
             Statement statement = DBConnector.getInstance().createStatement();
             ResultSet resultSet = statement.executeQuery("SELECT * FROM patika");
