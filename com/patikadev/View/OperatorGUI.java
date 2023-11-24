@@ -93,9 +93,8 @@ public class OperatorGUI extends JFrame {
 
         //ModelUserList
         mdl_user_list = new DefaultTableModel(){
-            //Bu metod sayesinde tablomuzdaki ID degerlerinde tablo uzarinden degisiklik yapilamaz
             @Override
-            public boolean isCellEditable(int row, int column) { //colon esit 0 ise disardan mudahale = false
+            public boolean isCellEditable(int row, int column) { 
                 if (column == 0)
                     return false;
 
@@ -106,29 +105,20 @@ public class OperatorGUI extends JFrame {
 
         Object[] col_user_list = {"ID" , "Name Surname" , "User Name" , "Password" , "User Type"};
         mdl_user_list.setColumnIdentifiers(col_user_list);
-        //satirlarimi bu dizinin icerisinde olusacak. Dizi boyutu bizim kolon sayisi kadar olacak
         row_user_list = new Object[col_user_list.length];
-        loadUserModel(); //Eleman eklemek icin olusturdugumuz metod
         tbl_user_list.setModel(mdl_user_list);
-        tbl_user_list.getTableHeader().setReorderingAllowed(false); //sutunun siralamasinin degismesine izin verme!!
+        tbl_user_list.getTableHeader().setReorderingAllowed(false); 
         tbl_user_list.getColumnModel().getColumn(0).setMaxWidth(75);
         tbl_user_list.getColumnModel().getColumn(0).setMinWidth(30);
 
         tbl_user_list.getSelectionModel().addListSelectionListener(e -> {
             try {
-                //tablomun istedigim noktasindaki kordinatini cagirmak icin kullandigimiz kod(getValueAt)
-                //Cok boyutlu array mantigi ile calisir. Bana satirdaki 0 index degerli kolonumu getir ve yazdir!!
                 String select_user_id = tbl_user_list.getValueAt(tbl_user_list.getSelectedRow(), 0).toString();
-                //Silme islemi yaptiktan sonra tablo yenilenmediginden program tablodaki silenen satirda takili kalip bulamiyor ve hata veriyor
-                //Bunun onune gecmek icin try catch icine alip programin patlamasini engelliyoruz
                 fld_user_id.setText(select_user_id);
             }catch (Exception exception){
-                //System.out.println(exception.getMessage());
+                System.out.println(exception.getMessage());
             }
         });
-
-
-        //Tablo uzerindeki degisiklikleri veri tabanina kaydetmek icin yazdigimiz metod
         tbl_user_list.getModel().addTableModelListener(e -> {
             if(e.getType() == TableModelEvent.UPDATE){
                 int user_id = Integer.parseInt(tbl_user_list.getValueAt(tbl_user_list.getSelectedRow() , 0).toString());
@@ -146,7 +136,7 @@ public class OperatorGUI extends JFrame {
             }
 
         });
-        //ModelUserList########################
+        //ModelUserList--
 
         //ModelPatikaList
         patikaPopupMenu = new JPopupMenu();
@@ -158,10 +148,9 @@ public class OperatorGUI extends JFrame {
         updateMenu.addActionListener(e -> {
             int select_id = Integer.parseInt(tbl_patika_list.getValueAt(tbl_patika_list.getSelectedRow() , 0).toString());
             UpdatePatikaGUI updateGUI = new UpdatePatikaGUI(Patika.getFetch(select_id));
-            //Update islemi yaptiktan sonra patika tablosunu guncelledimiz metod override
             updateGUI.addWindowListener(new WindowAdapter() {
                 @Override
-                public void windowClosed(WindowEvent e) { //pencere kapandiktan sonra bu islemi yap
+                public void windowClosed(WindowEvent e) { 
                     loadPatikaModel();
                     loadPatikaCmbBox();
                     loadCourseModel();
@@ -197,7 +186,7 @@ public class OperatorGUI extends JFrame {
         loadPatikaModel();
         tbl_patika_list.setModel(mdl_patika_list);
         tbl_patika_list.setComponentPopupMenu(patikaPopupMenu);
-        tbl_patika_list.getTableHeader().setReorderingAllowed(false); // sutunlarin yerini oynatmaya izin vermiyoruz
+        tbl_patika_list.getTableHeader().setReorderingAllowed(false); 
         tbl_patika_list.getColumnModel().getColumn(0).setMaxWidth(75);
         tbl_patika_list.getColumnModel().getColumn(0).setMinWidth(30);
 
@@ -206,11 +195,9 @@ public class OperatorGUI extends JFrame {
                 String select_patika_id = tbl_patika_list.getValueAt(tbl_patika_list.getSelectedRow(), 0).toString();
                 fld_patika_delete.setText(select_patika_id);
             }catch (Exception exception){
-                //System.out.println(exception.getMessage());
+                System.out.println(exception.getMessage());
             }
         });
-
-        //Patika menusunde sag tikladigimiz yerin mavi yanmasi icin yaptigimiz ayarlama
         tbl_patika_list.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
@@ -219,7 +206,7 @@ public class OperatorGUI extends JFrame {
                 tbl_patika_list.setRowSelectionInterval(selected_row,selected_row);
             }
         });
-        //ModelPatikaList########################
+        //ModelPatikaList--
 
         //ModelCourseList
         mdl_course_list = new DefaultTableModel();
@@ -236,13 +223,13 @@ public class OperatorGUI extends JFrame {
                 String select_course_id = tbl_course_list.getValueAt(tbl_course_list.getSelectedRow(), 0).toString();
                 fld_course_delete.setText(select_course_id);
             }catch (Exception exception){
-                //System.out.println(exception.getMessage());
+                System.out.println(exception.getMessage());
             }
         });
 
         loadPatikaCmbBox();
         loadEducatorCmbBox();
-        //ModelCourseList##########
+        //ModelCourseList--
 
         //ModelContentsList
         mdl_contents_list = new DefaultTableModel();
@@ -260,10 +247,10 @@ public class OperatorGUI extends JFrame {
                 String select_user_id = tbl_contents_list.getValueAt(tbl_contents_list.getSelectedRow(), 0).toString();
                 fld_contents_delete.setText(select_user_id);
             }catch (Exception exception){
-                //System.out.println(exception.getMessage());
+                System.out.println(exception.getMessage());
             }
         });
-        //ModelContentsList##########
+        //ModelContentsList--
 
         //ModelQuizList
         mdl_quiz_list = new DefaultTableModel();
@@ -281,10 +268,10 @@ public class OperatorGUI extends JFrame {
                 String select_user_id = tbl_quiz_list.getValueAt(tbl_quiz_list.getSelectedRow(), 0).toString();
                 fld_quiz_delete.setText(select_user_id);
             }catch (Exception exception){
-                //System.out.println(exception.getMessage());
+                System.out.println(exception.getMessage());
             }
         });
-        //ModelQuizList##########
+        //ModelQuizList--
 
         btn_user_delete.addActionListener(e -> {
             if(Helper.isFieldEmpty(fld_user_id)){
@@ -389,7 +376,7 @@ public class OperatorGUI extends JFrame {
             }
         });
 
-        //Arama Butonu
+        //Arama
         btn_user_sh.addActionListener(e -> {
             String name = fld_sh_user_name.getText();
             String uname = fld_sh_user_uname.getText();
@@ -505,8 +492,6 @@ public class OperatorGUI extends JFrame {
 
         }
     }
-
-    //PatikaTableRefresh
     private void loadPatikaModel() {
         DefaultTableModel clearModel = (DefaultTableModel) tbl_patika_list.getModel();
         clearModel.setRowCount(0);
@@ -521,7 +506,6 @@ public class OperatorGUI extends JFrame {
     }
 
     public void loadUserModel(){
-        //Asagidaki ilk kod ile tablomu getirdim. Ikinci kod ilede tablomu sifirladim. En son for loop ile yeni elemani ekledim
         DefaultTableModel clearModel = (DefaultTableModel) tbl_user_list.getModel();
         clearModel.setRowCount(0);
         int i;
@@ -537,7 +521,6 @@ public class OperatorGUI extends JFrame {
     }
 
     public void loadUserModel(ArrayList<User> list){
-        //Asagidaki ilk kod ile tablomu getirdim. Ikinci kod ilede tablomu sifirladim. En son for loop ile yeni elemani ekledim
         DefaultTableModel clearModel = (DefaultTableModel) tbl_user_list.getModel();
         clearModel.setRowCount(0);
         for ( User obj : list){
@@ -552,14 +535,14 @@ public class OperatorGUI extends JFrame {
     }
 
     public void loadPatikaCmbBox(){
-        cmb_course_patika.removeAllItems(); //bu box icerisindeki tum verileri kaldiriyoruz
+        cmb_course_patika.removeAllItems(); 
         for ( Patika obj : Patika.getList()){
             cmb_course_patika.addItem(new Item(obj.getId(), obj.getName()));
         }
     }
 
     public void loadEducatorCmbBox(){
-        cmb_course_user.removeAllItems(); //bu box icerisindeki tum verileri kaldiriyoruz
+        cmb_course_user.removeAllItems(); 
         for (User obj : User.getList()){
             if (obj.getType().equals("educator")){
                 cmb_course_user.addItem(new Item(obj.getId() , obj.getName()));
