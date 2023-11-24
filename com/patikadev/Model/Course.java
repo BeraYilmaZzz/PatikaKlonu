@@ -212,7 +212,6 @@ public class Course {
             preparedStatement.setInt(1 , id);
             ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next()){
-                //(int id, int user_id, int patika_id, String name, String lang)
                 obj = new Course(resultSet.getInt("id") , resultSet.getInt("user_id") ,
                         resultSet.getInt("patika_id") , resultSet.getString("name"), resultSet.getString("lang"));
             }
@@ -230,7 +229,6 @@ public class Course {
             preparedStatement.setInt(1 , educatorID);
             ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next()){
-                //(int id, int user_id, int patika_id, String name, String lang)
                 obj = new Course(resultSet.getInt("id") , resultSet.getInt("user_id") ,
                         resultSet.getInt("patika_id") , resultSet.getString("name"), resultSet.getString("lang"));
             }
@@ -266,7 +264,6 @@ public class Course {
             preparedStatement.setInt(1 , patika_id);
             ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next()){
-                //(int id, int user_id, int patika_id, String name, String lang)
                 obj = new Course(resultSet.getInt("id") , resultSet.getInt("user_id") ,
                         resultSet.getInt("patika_id") , resultSet.getString("name"), resultSet.getString("lang"));
             }
