@@ -84,7 +84,6 @@ public class Contents {
         this.course = course;
     }
 
-    //VERITABANINDAKI OBJELERI TUTTUGUMUZ arratlist
     public static ArrayList<Contents> getList(){
         ArrayList<Contents> contentsList = new ArrayList<>();
         String query = "SELECT * FROM contents";
