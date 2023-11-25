@@ -1,343 +1,272 @@
-package com.patikadev.View;
+package patika_clone.View;
 
-import com.patikadev.Helper.Config;
-import com.patikadev.Helper.Helper;
-import com.patikadev.Helper.Item;
-import com.patikadev.Model.*;
-
+import patika_clone.Helper.Config;
+import patika_clone.Helper.DBConnector;
+import patika_clone.Helper.Helper;
+import patika_clone.Helper.Item;
+import patika_clone.Model.Content;
+import patika_clone.Model.Course;
+import patika_clone.Model.Quiz;
 import javax.swing.*;
 import javax.swing.event.TableModelEvent;
 import javax.swing.table.DefaultTableModel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 
-public class EducatorGUI extends JFrame{
+public class EducatorGUI extends JFrame {
     private JPanel wrapper;
-    private JTabbedPane pnl_contents_list;
-    private JPanel pnl_top;
-    private JButton btn_logout;
-    private JTextField fld_contents_title;
-    private JTextField fld_contents_explanation;
-    private JTextField fld_contents_youtube_link;
-    private JButton btn_contents_add;
-    private JButton btn_contants_delete;
-    private JScrollPane scrl_contents_list;
-    private JTable tbl_contents_list;
-    private JTextField fld_delete_contents;
-    private JComboBox cmb_contents_course;
-    private JComboBox cmb_contents_course_search;
-    private JLabel lbl_welcome;
-    private JPanel pnl_contennts_right;
-    private JTextField fld_contents_title_search;
-    private JTextField fld_exlapanation;
-    private JButton btn_contents_search;
-    private JPanel pnl_educator_quiz_list;
-    private JScrollPane scrl_educator_quiz;
-    private JTable tbl_quiz_list;
-    private JComboBox cmb_quiz_course_name;
-    private JComboBox cmb_quiz_contents_name;
-    private JTextField fld_quiz_question;
-    private JTextField fld_quiz_answer;
-    private JButton btn_quiz_add;
-    private JTextField fld_quiz_delete;
-    private JButton btn_quiz_delete;
-    private JComboBox cmb_quiz_course_search;
-    private JComboBox cmb_quiz_contents_search;
-    private JButton btn_quiz_search;
-    private DefaultTableModel mdl_contents_list;
-    private Object[] row_content_list;
-    DefaultTableModel mdl_quiz_list;
-    private Object[] row_quiz_list;
-    private Educator educator;
+    private JTabbedPane panel_quiz;
+    private JTable table_eduCourse;
+    private JButton button_eduExit;
+    private JPanel panel;
+    private JTable table_eduContent;
+    private JPanel panel_courses;
+    private JPanel panel_contents;
+    private JScrollPane scroll_courses;
+    private JTextField field_header_add;
+    private JTextField field_description_add;
+    private JTextField field_youtube_add;
+    private JScrollPane scroll_quiz;
+    private JTextField field_language_add;
+    private JButton button_content_add;
+    private JTextField field_content_delete;
+    private JButton button_content_delete;
+    private JTable table_quiz;
+    private JPanel panel_quizes;
+    private JTextField field_quiz_question;
+    private JComboBox combo_description;
+    private JButton button_quiz_add;
+    private JComboBox combo_content_lang;
+    private JPanel panel_search;
+    private JTextField field_search_header;
+    private JTextField field_search_desc;
+    private JButton searchButton;
+    private DefaultTableModel model_eduCourse;
+    private Object[] row_eduCourse;
+    private int user_id;
+    private  DefaultTableModel model_eduContent;
+    private Object[] row_eduContent;
+    private int id;
+    private DefaultTableModel model_quiz;
+    private Object[] row_quiz;
+    private String language;
 
-    public EducatorGUI(Educator educator){
-        this.educator = educator;
+    public EducatorGUI(int user_id){
+        this.user_id = user_id;
+
         add(wrapper);
         setSize(1000,500);
-        setLocation(Helper.screenCenterPoint("x",getSize()) , Helper.screenCenterPoint("y" , getSize()));
+        setLocation(Helper.screenCenter("x",getSize()),Helper.screenCenter("y",getSize()));
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setTitle(Config.PROJECT_TITLE);
-        setResizable(true);
         setVisible(true);
 
-        lbl_welcome.setText("Welcome" + educator.getName());
+        model_quiz = new DefaultTableModel();
+        Object[] col_quiz = {"ID","Quiz","Content"};
+        model_quiz.setColumnIdentifiers(col_quiz);
+        row_quiz = new Object[col_quiz.length];
+        table_quiz.setModel(model_quiz);
+        table_quiz.getTableHeader().setReorderingAllowed(false);
+        loadQuiz();
+        loadQuizCombo();
 
-        //ContentsModel
-        mdl_contents_list = new DefaultTableModel(){
+        model_eduCourse = new DefaultTableModel();
+        Object[] col_eduCourses_list = {"Course Name","Course Language"};
+        model_eduCourse.setColumnIdentifiers(col_eduCourses_list);
+        row_eduCourse = new Object[col_eduCourses_list.length];
+        table_eduCourse.setModel(model_eduCourse);
+        table_eduCourse.getTableHeader().setReorderingAllowed(false);
+        loadCourses();
+
+        model_eduContent = new DefaultTableModel(){
             @Override
             public boolean isCellEditable(int row, int column) {
-                if ((column == 0) || (column == 1))
+                if (column ==0)
                     return false;
-
                 return super.isCellEditable(row, column);
             }
         };
-        Object[] col_contents_list = {"ID" , "Course Name" , "Title" , "Explanation" , "YouTube Link"};
-        mdl_contents_list.setColumnIdentifiers(col_contents_list);
-        row_content_list = new Object[col_contents_list.length];
-        loadContentsModel();
-        tbl_contents_list.setModel(mdl_contents_list);
-        tbl_contents_list.getColumnModel().getColumn(0).setMaxWidth(50);
-        tbl_contents_list.getColumnModel().getColumn(0).setMinWidth(20);
-        tbl_contents_list.getTableHeader().setReorderingAllowed(false);
+        Object[] col_eduContents_list = {"ID","Header","Description","Youtube","Language"};
+        model_eduContent.setColumnIdentifiers(col_eduContents_list);
+        row_eduContent = new Object[col_eduContents_list.length];
+        table_eduContent.setModel(model_eduContent);
+        table_eduContent.getTableHeader().setReorderingAllowed(false);
+        table_eduContent.getColumnModel().getColumn(0).setMaxWidth(60);
+        loadContent();
+        loadContentLangCombo();
 
-        tbl_contents_list.getSelectionModel().addListSelectionListener(e -> {
-            try {
-                String selected_row = tbl_contents_list.getValueAt(tbl_contents_list.getSelectedRow() , 0).toString();
-                fld_delete_contents.setText(selected_row);
-            }catch (Exception ex){
-            }
-        });
-
-        tbl_contents_list.getModel().addTableModelListener(e -> {
-            if (e.getType() == TableModelEvent.UPDATE){
-                int id = Integer.parseInt(tbl_contents_list.getValueAt(tbl_contents_list.getSelectedRow(),0).toString());
-                String contents_title = (tbl_contents_list.getValueAt(tbl_contents_list.getSelectedRow(),2).toString());
-                String contents_explanation = (tbl_contents_list.getValueAt(tbl_contents_list.getSelectedRow(),3).toString());
-                String contents_youtube_link = (tbl_contents_list.getValueAt(tbl_contents_list.getSelectedRow(),4).toString());
-
-                if (Contents.update(id,contents_title,contents_explanation,contents_youtube_link)){
+        table_eduContent.getModel().addTableModelListener(e -> {
+            if (e.getType() == TableModelEvent.UPDATE) {
+                int id = Integer.parseInt(table_eduContent.getValueAt(table_eduContent.getSelectedRow(), 0).toString());
+                String header = table_eduContent.getValueAt(table_eduContent.getSelectedRow(), 1).toString();
+                String description = table_eduContent.getValueAt(table_eduContent.getSelectedRow(), 2).toString();
+                String youtube = table_eduContent.getValueAt(table_eduContent.getSelectedRow(), 3).toString();
+                String language = table_eduContent.getValueAt(table_eduContent.getSelectedRow(), 4).toString();
+                if (Content.update(id, header, description, youtube,language)) {
                     Helper.showMsg("done");
-                    loadContentsModel();
-                    loaQuizModel();
-                    loadQuizContentsSearchCmbBox();
-                    loadContentsQuizCmbBox();
-                }else {
+                    loadContent();
+                } else {
                     Helper.showMsg("error");
                 }
             }
         });
 
-        loadContentsCmbBox();
-        loadContentsCmbBoxSearch();
-        loadQuizCourseCmbBox();
-        loadContentsQuizCmbBox();
 
-        //ContentsModel#####
-
-        //QuizModel
-        mdl_quiz_list = new DefaultTableModel(){
-            @Override
-            public boolean isCellEditable(int row, int column) {
-                if ((column == 0) || (column == 1) || (column == 2))
-                    return false;
-
-                return super.isCellEditable(row, column);
-            }
-        };
-
-        Object[] col_quiz_list = {"ID" , "Course Name" , "Contents Title" , "Question" , "Answer"};
-        mdl_quiz_list.setColumnIdentifiers(col_quiz_list);
-        row_quiz_list = new Object[col_quiz_list.length];
-        loaQuizModel();
-        tbl_quiz_list.setModel(mdl_quiz_list);
-        tbl_quiz_list.getColumnModel().getColumn(0).setMaxWidth(50);
-        tbl_quiz_list.getColumnModel().getColumn(0).setMinWidth(20);
-        tbl_quiz_list.getTableHeader().setReorderingAllowed(false);
-        loadQuizCourseCmbBox();
-        loadContentsQuizCmbBox();
-        loadQuizContentsSearchCmbBox();
-        loadQuizCourseSearchCmbBox();
-
-        tbl_quiz_list.getModel().addTableModelListener(e -> {
-            if (e.getType() == TableModelEvent.UPDATE){
-                int id = Integer.parseInt(tbl_quiz_list.getValueAt(tbl_quiz_list.getSelectedRow(),0).toString());
-                String quiz_question = (tbl_quiz_list.getValueAt(tbl_quiz_list.getSelectedRow(),3).toString());
-                String quiz_answer = (tbl_quiz_list.getValueAt(tbl_quiz_list.getSelectedRow(),4).toString());
-                if (Quiz.update(id, quiz_question ,quiz_answer)){
-                    Helper.showMsg("done");
-                    loaQuizModel();
-                }else {
-                    Helper.showMsg("error");
-                }
-            }
-        });
-
-        tbl_quiz_list.getSelectionModel().addListSelectionListener(e -> {
-            try {
-                String selected_row = tbl_quiz_list.getValueAt(tbl_quiz_list.getSelectedRow() , 0).toString();
-                fld_quiz_delete.setText(selected_row);
-            }catch (Exception ex){
-            }
-        });
-
-        //QuizModel###
-        
-        btn_logout.addActionListener(e -> {
+        button_eduExit.addActionListener(e -> {
             dispose();
-            LoginGUI loginGUI = new LoginGUI();
+            LoginGUI login = new LoginGUI();
         });
-
-        btn_contents_add.addActionListener(e -> {
-            Item courseItem = (Item) cmb_contents_course.getSelectedItem();
-            if (Helper.isFieldEmpty(fld_contents_title) || Helper.isFieldEmpty(fld_contents_explanation) || Helper.isFieldEmpty(fld_contents_youtube_link)){
+        
+        button_content_add.addActionListener(e -> {
+            if (field_description_add.getText().isEmpty() || field_header_add.getText().isEmpty() || field_youtube_add.getText().isEmpty()){
                 Helper.showMsg("fill");
             }else {
-                if (Contents.add(courseItem.getKey(), fld_contents_title.getText() ,fld_contents_explanation.getText() ,fld_contents_youtube_link.getText())){
+                String header = field_header_add.getText();
+                String description = field_description_add.getText();
+                String youtube = field_youtube_add.getText();
+                String language = combo_content_lang.getSelectedItem().toString();
+                if (Content.add(id,user_id,header,description,youtube,language)){
                     Helper.showMsg("done");
-                    loadContentsModel();
-                    loaQuizModel();
-                    loadContentsQuizCmbBox();
-                    loadQuizContentsSearchCmbBox();
-                }else {
-                    Helper.showMsg("error");
-                }
-                fld_contents_title.setText(null);
-                fld_contents_explanation.setText(null);
-                fld_contents_youtube_link.setText(null);
-            }
-        });
-
-
-        btn_contants_delete.addActionListener(e -> {
-            if (Helper.isFieldEmpty(fld_delete_contents)){
-                Helper.showMsg("fill");
-            }else {
-                int fld_delete= Integer.parseInt(fld_delete_contents.getText());
-                if (Contents.delete(fld_delete)){
-                    Helper.showMsg("done");
-                    Quiz.deleteByContentsID(fld_delete);
-                    loadContentsModel();
-                    loaQuizModel();
-                    loadContentsQuizCmbBox();
-                    loadQuizContentsSearchCmbBox();
+                    loadContent();
+                    loadQuizCombo();
+                    field_header_add.setText(null);
+                    field_youtube_add.setText(null);
+                    field_description_add.setText(null);
                 }else {
                     Helper.showMsg("error");
                 }
             }
-
         });
 
-        btn_quiz_add.addActionListener(e -> {
-            Item courseItem = (Item) cmb_quiz_course_name.getSelectedItem();
-            Item contentsItem = (Item) cmb_quiz_contents_name.getSelectedItem();
-            if (Helper.isFieldEmpty(fld_quiz_question) || Helper.isFieldEmpty(fld_quiz_answer)){
+        button_quiz_add.addActionListener(e -> {
+            if (field_quiz_question.getText().isEmpty()|| combo_description.getSelectedItem().toString().isEmpty()){
                 Helper.showMsg("fill");
             }else {
-                if(Quiz.add(courseItem.getKey() , contentsItem.getKey() ,fld_quiz_question.getText() , fld_quiz_answer.getText())){
+                String quiz = field_quiz_question.getText();
+                String description = combo_description.getSelectedItem().toString();
+                if (Quiz.add(id,user_id,quiz,description)){
                     Helper.showMsg("done");
-                    loaQuizModel();
+                    loadQuiz();
+                    loadQuizCombo();
+                    field_quiz_question.setText(null);
+                }else {
+                    Helper.showMsg("error");
+                }
+            }
+        });
+
+        button_content_delete.addActionListener(e -> {
+            if (Helper.isFieldEmpty(field_content_delete)){
+                Helper.showMsg("fill");
+            }else {
+                int id = Integer.parseInt(field_content_delete.getText());
+                if (Content.delete(id)){
+                    Helper.showMsg("done");
+                    loadContent();
+                    field_content_delete.setText(null);
                 }else{
                     Helper.showMsg("error");
                 }
-                fld_quiz_question.setText(null);
-                fld_quiz_answer.setText(null);
             }
         });
 
-        btn_quiz_delete.addActionListener(e -> {
-            if (Helper.isFieldEmpty(fld_quiz_delete)){
-                Helper.showMsg("fill");
-            }else {
-                int fld_delete= Integer.parseInt(fld_quiz_delete.getText());
-                if (Quiz.delete(fld_delete)){
-                    Helper.showMsg("done");
-                    loaQuizModel();
-                }else {
-                    Helper.showMsg("error");
-                }
+        searchButton.addActionListener(e -> {
+            String header = field_search_header.getText();
+            String description = field_search_desc.getText();
+            String query = Content.searchQuery(header,description);
+            ArrayList<Content> searchContent = Content.searchUserList(query);
+            loadContent(Content.searchUserList(query));
+        });
+        
+    }
+
+    public void loadCourses() {
+        ArrayList<Course> courseList = Course.getListByUser(user_id);
+        if (courseList.isEmpty()){
+            Helper.showMsg("You are not attached to any course!");
+        }else {
+            for (Course obj : courseList){
+                int i=0;
+                row_eduCourse[i++] = obj.getName();
+                row_eduCourse[i++] = obj.getLanguage();
+                model_eduCourse.addRow(row_eduCourse);
             }
-        });
-
-        btn_quiz_search.addActionListener(e -> {
-            String courseName = cmb_quiz_course_search.getSelectedItem().toString();
-            String ContentsTitle = cmb_quiz_contents_search.getSelectedItem().toString();
-            String query = Quiz.searchQuery(educator.getId(),courseName,ContentsTitle);
-            ArrayList<Quiz> searchQuiz = Quiz.searchQuizList(query);
-            loaQuizModel(searchQuiz);
-        });
-        cmb_quiz_course_name.addActionListener(e -> {
-            loadContentsQuizCmbBox();
-        });
+       }
     }
-
-    private void loaQuizModel() {
-        DefaultTableModel clearModel = (DefaultTableModel) tbl_quiz_list.getModel();
+    public void loadContent(){
+        DefaultTableModel clearModel = (DefaultTableModel) table_eduContent.getModel();
         clearModel.setRowCount(0);
-        int i;
-        for (Quiz obj : Quiz.getList()){
-
-            i = 0;
-            row_quiz_list[i++] = obj.getId();
-            row_quiz_list[i++] = obj.getCourse().getName();
-            row_quiz_list[i++] = obj.getContents().getTitle();
-            row_quiz_list[i++] = obj.getQuiz_question();
-            row_quiz_list[i++] = obj.getQuiz_answer();
-            mdl_quiz_list.addRow(row_quiz_list);
+        ArrayList<Content> contentList = Content.getListByUser(user_id,language);
+        if (contentList.isEmpty()){
+            Helper.showMsg("You don't have any content active!");
+        }else {
+            for (Content con : contentList){
+                int i = 0;
+                row_eduContent[i++] = con.getId();
+                row_eduContent[i++] = con.getHeader();
+                row_eduContent[i++] = con.getDescription();
+                row_eduContent[i++] = con.getyLink();
+                row_eduContent[i++] = con.getLanguage();
+                model_eduContent.addRow(row_eduContent);
+            }
         }
     }
 
-    private void loaQuizModel(ArrayList<Quiz> list) {
-        DefaultTableModel clearModel = (DefaultTableModel) tbl_quiz_list.getModel();
+    public void loadQuiz(){
+        DefaultTableModel clearModel = (DefaultTableModel) table_quiz.getModel();
         clearModel.setRowCount(0);
-        int i;
-        for (Quiz obj : list){
-            i = 0;
-            row_quiz_list[i++] = obj.getId();
-            row_quiz_list[i++] = obj.getCourse().getName();
-            row_quiz_list[i++] = obj.getContents().getTitle();
-            row_quiz_list[i++] = obj.getQuiz_question();
-            row_quiz_list[i++] = obj.getQuiz_answer();
-            mdl_quiz_list.addRow(row_quiz_list);
+        ArrayList<Quiz> contentList = Quiz.getListByUser(user_id);
+        if (contentList.isEmpty()){
+            Helper.showMsg("Please insert a quiz for your contents!");
+        }else {
+            for (Quiz con : contentList){
+                int i = 0;
+                row_quiz[i++] = con.getId();
+                row_quiz[i++] = con.getQuiz();
+                row_quiz[i++] = con.getDescription();
+                model_quiz.addRow(row_quiz);
+                loadQuizCombo();
+            }
+        }
+
+    }
+
+    public void loadQuizCombo(){
+        combo_description.removeAllItems();
+        for(Content obj:Content.getQuiz(user_id)){
+            combo_description.addItem(new Item(obj.getId(),obj.getDescription()));
+
         }
     }
-    private void loadContentsModel() {
-        DefaultTableModel clearModel = (DefaultTableModel) tbl_contents_list.getModel();
+
+    public void loadContentLangCombo(){
+        combo_content_lang.removeAllItems();
+        for (Course course : Course.getListByUser(user_id)){
+            combo_content_lang.addItem(new Item(course.getId(),course.getLanguage()));
+        }
+    }
+
+    public void loadContent(ArrayList<Content> list) {
+        DefaultTableModel clearModel = (DefaultTableModel) table_eduContent.getModel();
         clearModel.setRowCount(0);
-
-        int i;
-        for (Contents obj : Contents.getList()){
-            i = 0;
-            row_content_list[i++] = obj.getId();
-            row_content_list[i++] = obj.getCourse().getName();
-            row_content_list[i++] = obj.getTitle();
-            row_content_list[i++] = obj.getExplanation();
-            row_content_list[i++] = obj.getYoutube_link();
-            mdl_contents_list.addRow(row_content_list);
+        ArrayList<Content> contentList = Content.getListByUser(user_id,language);
+        if (contentList.isEmpty()){
+            Helper.showMsg("You don't have any content active!");
+        }else {
+            for (Content con : list){
+                int i = 0;
+                row_eduContent[i++] = con.getId();
+                row_eduContent[i++] = con.getHeader();
+                row_eduContent[i++] = con.getDescription();
+                row_eduContent[i++] = con.getyLink();
+                row_eduContent[i++] = con.getLanguage();
+                model_eduContent.addRow(row_eduContent);
+            }
         }
     }
-
-    public void loadContentsCmbBox(){
-        cmb_contents_course.removeAllItems();
-        for(Course obj : Course.getList()){
-            cmb_contents_course.addItem(new Item(obj.getId(), obj.getName()));
-        }
-    }
-    public void loadContentsCmbBoxSearch(){
-        cmb_contents_course_search.removeAllItems();
-        for(Course obj : Course.getList()){
-            cmb_contents_course_search.addItem(new Item(obj.getId(), obj.getName()));
-        }
-    }
-    public void loadQuizContentsSearchCmbBox(){
-        cmb_quiz_contents_search.removeAllItems();
-        for(Contents obj : Contents.getList()){
-            cmb_quiz_contents_search.addItem(new Item(obj.getId(), obj.getTitle()));
-        }
-    }
-    public void loadQuizCourseCmbBox(){
-        cmb_quiz_course_name.removeAllItems();
-        for (Course obj : Course.getList()){
-            cmb_quiz_course_name.addItem(new Item(obj.getId(), obj.getName()));
-        }
-    }
-
-    public void loadQuizCourseSearchCmbBox(){
-        cmb_quiz_course_search.removeAllItems();
-        for (Course obj : Course.getList()){
-            cmb_quiz_course_search.addItem(new Item(obj.getId(), obj.getName()));
-        }
-    }
-
-    public void loadContentsQuizCmbBox(){
-        Item courseItem = (Item) cmb_quiz_course_name.getSelectedItem();
-        cmb_quiz_contents_name.removeAllItems();
-        cmb_quiz_contents_name.addItem(new Item(0,null));
-        for (Contents obj : Contents.getListByCourseID(courseItem.getKey())){
-            cmb_quiz_contents_name.addItem(new Item(obj.getId(), obj.getTitle()));
-        }
-    }
-
 }
