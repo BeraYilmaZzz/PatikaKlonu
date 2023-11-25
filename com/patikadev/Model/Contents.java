@@ -1,6 +1,7 @@
-package com.patikadev.Model;
+package patika_clone.Model;
 
-import com.patikadev.Helper.DBConnector;
+import patika_clone.Helper.DBConnector;
+import patika_clone.Helper.Helper;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -8,32 +9,74 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
-public class Contents {
+public class Content {
     private int id;
-    private int course_id;
-    private String title;
-    private String explanation;
-    private String youtube_link;
+    private String header;
+    private String description;
+    private String yLink;
+    private String language;
+    private User educator;
+    private int user_id;
 
-    private Course course;
-
-    public Contents(int id, int course_id, String title, String explanation, String youtube_link) {
+    public Content(int id,int user_id, String header, String description, String yLink,String language) {
         this.id = id;
-        this.course_id = course_id;
-        this.title = title;
-        this.explanation = explanation;
-        this.youtube_link = youtube_link;
-
-        this.course = Course.getFetch(course_id);
-    }
-    public Contents(int id, String title, String explanation, String youtube_link) {
-        this.id = id;
-        this.title = title;
-        this.explanation = explanation;
-        this.youtube_link = youtube_link;
+        this.header = header;
+        this.description = description;
+        this.yLink = yLink;
+        this.language = language;
+        this.user_id = User.getFetchInt(user_id);
     }
 
-    public Contents() {
+    public Content() {
+
+    }
+
+    public int getUser_id() {
+        return user_id;
+    }
+
+    public User getEducator() {
+        return educator;
+    }
+
+    public void setEducator(User educator) {
+        this.educator = educator;
+    }
+
+    public void setUser_id(int user_id) {
+        this.user_id = user_id;
+    }
+
+    public String getHeader() {
+        return header;
+    }
+
+    public void setHeader(String header) {
+        this.header = header;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getyLink() {
+        return yLink;
+    }
+
+    public void setyLink(String yLink) {
+        this.yLink = yLink;
+    }
+
+    public String getLanguage() {
+        return language;
+    }
+
+    public void setLanguage(String language) {
+        this.language = language;
     }
 
     public int getId() {
@@ -44,189 +87,142 @@ public class Contents {
         this.id = id;
     }
 
-    public int getCourse_id() {
-        return course_id;
-    }
-
-    public void setCourse_id(int course_id) {
-        this.course_id = course_id;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getExplanation() {
-        return explanation;
-    }
-
-    public void setExplanation(String explanation) {
-        this.explanation = explanation;
-    }
-
-    public String getYoutube_link() {
-        return youtube_link;
-    }
-
-    public void setYoutube_link(String youtube_link) {
-        this.youtube_link = youtube_link;
-    }
-
-    public Course getCourse() {
-        return course;
-    }
-
-    public void setCourse(Course course) {
-        this.course = course;
-    }
-
-    public static ArrayList<Contents> getList(){
-        ArrayList<Contents> contentsList = new ArrayList<>();
-        String query = "SELECT * FROM contents";
-        Contents obj;
+    public static ArrayList<Content> getListByUser(int user_id,String language){
+        ArrayList<Content> courseList = new ArrayList<>();
+        Content obj;
         try {
-            Statement statement = DBConnector.getInstance().createStatement();
-            ResultSet resultSet = statement.executeQuery(query);
-            while (resultSet.next()){
-                int id = resultSet.getInt("id");
-                int course_id = resultSet.getInt("course_id");
-                String title = resultSet.getString("title");
-                String explanation = resultSet.getString("explanation");
-                String youtube_link = resultSet.getString("youtube_link");
-
-                obj = new Contents(id , course_id, title , explanation , youtube_link);
-                contentsList.add(obj);
+            Statement st = DBConnector.getInstance().createStatement();
+            ResultSet rs = st.executeQuery("SELECT * FROM content WHERE user_id ="+user_id);
+            while (rs.next()){
+                int contentID = rs.getInt("id");
+                int ID = rs.getInt("user_id");
+                String header = rs.getString("header");
+                String description =rs.getString("description");
+                String yLink = rs.getString("yLink");
+                String lang = rs.getString("language");
+                obj = new Content(contentID,ID,header,description,yLink,lang);
+                courseList.add(obj);
             }
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
         }
-        return contentsList;
+
+        return courseList;
     }
-
-    public static ArrayList<Contents> getListByCourseID(int courseID){
-        ArrayList<Contents> contentsList = new ArrayList<>();
-        String query = "SELECT * FROM contents WHERE course_id = " + courseID;
-        Contents obj;
+    public static boolean add(int id,int user_id,String header, String description, String yLink,String language){
+        String query = "INSERT INTO content (id,user_id,header,description,yLink,language) VALUES (?,?,?,?,?,?)";
         try {
-            Statement statement = DBConnector.getInstance().createStatement();
-            ResultSet resultSet = statement.executeQuery(query);
-            while (resultSet.next()){
-                int id = resultSet.getInt("id");
-                int course_id = resultSet.getInt("course_id");
-                String title = resultSet.getString("title");
-                String explanation = resultSet.getString("explanation");
-                String youtube_link = resultSet.getString("youtube_link");
-
-                obj = new Contents(id , course_id, title , explanation , youtube_link);
-                contentsList.add(obj);
-            }
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-        }
-        return contentsList;
-    }
-
-    public static boolean update(int id , String title , String explanation , String youtube_link){
-        String query = "UPDATE contents SET title=?,explanation=?,youtube_link=? WHERE id=?";
-
-        try {
-            PreparedStatement preparedStatement = DBConnector.getInstance().prepareStatement(query);
-            preparedStatement.setString(1,title);
-            preparedStatement.setString(2,explanation);
-            preparedStatement.setString(3,youtube_link);
-            preparedStatement.setInt(4,id);
-
-            return preparedStatement.executeUpdate() != -1;
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-        }
-        return true;
-    }
-
-
-    public static boolean add(int course_id, String title, String explanation , String youtube_link){
-        String query = "INSERT INTO contents (course_id , title , explanation , youtube_link) VALUES (?,?,?,?)";
-        try {
-            PreparedStatement preparedStatement = DBConnector.getInstance().prepareStatement(query);
-            preparedStatement.setInt(1, course_id);
-            preparedStatement.setString(2, title);
-            preparedStatement.setString(3, explanation);
-            preparedStatement.setString(4, youtube_link);
-            return preparedStatement.executeUpdate() != -1;
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            PreparedStatement pr = DBConnector.getInstance().prepareStatement(query);
+            pr.setInt(1,id);
+            pr.setInt(2, user_id);
+            pr.setString(3,header);
+            pr.setString(4,description);
+            pr.setString(5,yLink);
+            pr.setString(6,language);
+            return pr.executeUpdate() != -1;
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
         }
         return true;
     }
 
     public static boolean delete(int id){
-        String query = "DELETE FROM contents WHERE id = ?";
+        String query = "DELETE FROM content WHERE id = ?";
         try {
-            PreparedStatement preparedStatement = DBConnector.getInstance().prepareStatement(query);
-            preparedStatement.setInt(1,id);
-            return preparedStatement.executeUpdate() != -1;
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            PreparedStatement pr = DBConnector.getInstance().prepareStatement(query);
+            pr.setInt(1,id);
+            return pr.executeUpdate() != -1;
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
         }
         return true;
     }
 
-    public static boolean deleteByCourseID(int course_id){
-        String query = "DELETE FROM contents WHERE course_id = ?";
+    public static boolean update(int id,String header,String description,String yLink,String language){
+        String query = "UPDATE content SET header=?,description=?,yLink=?,language=? WHERE id=?";
         try {
-            PreparedStatement preparedStatement = DBConnector.getInstance().prepareStatement(query);
-            preparedStatement.setInt(1,course_id);
-            return preparedStatement.executeUpdate() != -1;
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            PreparedStatement pr = DBConnector.getInstance().prepareStatement(query);
+            pr.setString(1,header);
+            pr.setString(2,description);
+            pr.setString(3,yLink);
+            pr.setString(4,language);
+            pr.setInt(5,id);
+            return  pr.executeUpdate() !=-1;
+
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
         }
+
         return true;
     }
-
-    public static Contents getFetch(int id){
-        Contents obj = null;
-        String query = "SELECT * FROM contents WHERE id = ?";
+    public static Content getFetch(int id){
+        Content obj = null;
+        String sql = "SELECT*FROM content WHERE id = ?";
         try {
-            PreparedStatement preparedStatement = DBConnector.getInstance().prepareStatement(query);
-            preparedStatement.setInt(1,id);
-            ResultSet resultSet = preparedStatement.executeQuery();
-            if (resultSet.next()){
-                obj = new Contents();
-                obj.setId(resultSet.getInt("id"));
-                obj.setCourse_id(resultSet.getInt("course_id"));
-                obj.setTitle(resultSet.getString("title"));
-                obj.setExplanation(resultSet.getString("explanation"));
-                obj.setYoutube_link(resultSet.getString("youtube_link"));
+            PreparedStatement pr = DBConnector.getInstance().prepareStatement(sql);
+            pr.setInt(1,id);
+            ResultSet rs = pr.executeQuery();
+            if (rs.next()){
+                obj = new Content();
+                obj.setId(rs.getInt("id"));
+                obj.setUser_id(rs.getInt("user_id"));
+                obj.setHeader(rs.getString("header"));
+                obj.setDescription(rs.getString("description"));
+                obj.setyLink(rs.getString("yLink"));
+                obj.setLanguage(rs.getString("language"));
             }
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            throw new RuntimeException(e);
         }
-        return obj;
+        return  obj;
     }
-
-    public static Contents getFetchByCourseID(int courseID){
-        Contents obj = null;
-        String query = "SELECT * FROM contents WHERE course_id = ?";
+    public static ArrayList<Content> searchUserList(String query){
+        ArrayList<Content> contentList = new ArrayList<>();
+        Content obj;
         try {
-            PreparedStatement preparedStatement = DBConnector.getInstance().prepareStatement(query);
-            preparedStatement.setInt(1,courseID);
-            ResultSet resultSet = preparedStatement.executeQuery();
-            if (resultSet.next()){
-                obj = new Contents();
-                obj.setId(resultSet.getInt("id"));
-                obj.setCourse_id(resultSet.getInt("course_id"));
-                obj.setTitle(resultSet.getString("title"));
-                obj.setExplanation(resultSet.getString("explanation"));
-                obj.setYoutube_link(resultSet.getString("youtube_link"));
+            Statement st = DBConnector.getInstance().createStatement();
+            ResultSet rs = st.executeQuery(query);
+            while (rs.next()){
+                obj = new Content();
+                obj.setId(rs.getInt("id"));
+                obj.setHeader(rs.getString("header"));
+                obj.setDescription(rs.getString("description"));
+                obj.setyLink(rs.getString("yLink"));
+                obj.setLanguage(rs.getString("language"));
+                contentList.add(obj);
             }
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            throw new RuntimeException(e);
         }
-        return obj;
+        return contentList;
+    }
+    public static String searchQuery(String header  ,String description){
+        String query = "SELECT * FROM content WHERE header LIKE '%{{header}}%' AND description LIKE '%{{description}}%'";
+        query = query.replace("{{header}}",header);
+        query = query.replace("{{description}}",description);
+        return query;
     }
 
+    public static ArrayList<Content> getQuiz(int user_id){
+        ArrayList<Content> contentList= new ArrayList<>();
+        String query = "SELECT * FROM content WHERE user_id=?";
+        try {
+            PreparedStatement pr = DBConnector.getInstance().prepareStatement(query);
+            pr.setInt(1,user_id);
+            ResultSet rs = pr.executeQuery();
+            while (rs.next()){
+                int id = rs.getInt("id");
+                int ID =rs.getInt("user_id");
+                String header   = rs.getString("header");
+                String description = rs.getString("description");
+                String yLink = rs.getString("yLink");
+                String language = rs.getString("language");
+                Content obj = new Content(id,ID,header,description,yLink,language);
+                contentList.add(obj);
+            }
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        return contentList;
+    }
 }
