@@ -83,13 +83,39 @@ public class OperatorGUI extends JFrame {
         int x = Helper.screenCenterPoint("x" , getSize());
         int y = Helper.screenCenterPoint("y" , getSize());
         setLocation(x , y);
-        //Ekranı kapatma
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setTitle(Config.PROJECT_TITLE);
-        //Gorunurlugunu acık yapıyorum
         setVisible(true);
-
         lbl_welcome.setText( "Welcome  " + operator.getName());
+
+        mdl_patika_list = new DefaultTableModel();
+        Object[] col_patika_list = {"ID" , "Patika Adi"};
+        mdl_patika_list.setColumnIdentifiers(col_patika_list);
+        row_patika_list = new Object[col_patika_list.length];
+        loadPatikaModel();
+        tbl_patika_list.setModel(mdl_patika_list);
+        tbl_patika_list.setComponentPopupMenu(patikaPopupMenu);
+        tbl_patika_list.getTableHeader().setReorderingAllowed(false); 
+        tbl_patika_list.getColumnModel().getColumn(0).setMaxWidth(75);
+        tbl_patika_list.getColumnModel().getColumn(0).setMinWidth(30);
+
+        tbl_patika_list.getSelectionModel().addListSelectionListener(e -> {
+            try {
+                String select_patika_id = tbl_patika_list.getValueAt(tbl_patika_list.getSelectedRow(), 0).toString();
+                fld_patika_delete.setText(select_patika_id);
+            }catch (Exception exception){
+                System.out.println(exception.getMessage());
+            }
+        });
+        tbl_patika_list.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                Point point = e.getPoint();
+                int selected_row = tbl_patika_list.rowAtPoint(point);
+                tbl_patika_list.setRowSelectionInterval(selected_row,selected_row);
+            }
+        });
+        //ModelPatikaList--
 
         //ModelUserList
         mdl_user_list = new DefaultTableModel(){
@@ -97,7 +123,6 @@ public class OperatorGUI extends JFrame {
             public boolean isCellEditable(int row, int column) { 
                 if (column == 0)
                     return false;
-
                 return super.isCellEditable(row, column);
             }
         };
@@ -108,9 +133,6 @@ public class OperatorGUI extends JFrame {
         row_user_list = new Object[col_user_list.length];
         tbl_user_list.setModel(mdl_user_list);
         tbl_user_list.getTableHeader().setReorderingAllowed(false); 
-        tbl_user_list.getColumnModel().getColumn(0).setMaxWidth(75);
-        tbl_user_list.getColumnModel().getColumn(0).setMinWidth(30);
-
         tbl_user_list.getSelectionModel().addListSelectionListener(e -> {
             try {
                 String select_user_id = tbl_user_list.getValueAt(tbl_user_list.getSelectedRow(), 0).toString();
@@ -176,41 +198,9 @@ public class OperatorGUI extends JFrame {
             }
 
         });
-
-
-
-        mdl_patika_list = new DefaultTableModel();
-        Object[] col_patika_list = {"ID" , "Patika Adi"};
-        mdl_patika_list.setColumnIdentifiers(col_patika_list);
-        row_patika_list = new Object[col_patika_list.length];
-        loadPatikaModel();
-        tbl_patika_list.setModel(mdl_patika_list);
-        tbl_patika_list.setComponentPopupMenu(patikaPopupMenu);
-        tbl_patika_list.getTableHeader().setReorderingAllowed(false); 
-        tbl_patika_list.getColumnModel().getColumn(0).setMaxWidth(75);
-        tbl_patika_list.getColumnModel().getColumn(0).setMinWidth(30);
-
-        tbl_patika_list.getSelectionModel().addListSelectionListener(e -> {
-            try {
-                String select_patika_id = tbl_patika_list.getValueAt(tbl_patika_list.getSelectedRow(), 0).toString();
-                fld_patika_delete.setText(select_patika_id);
-            }catch (Exception exception){
-                System.out.println(exception.getMessage());
-            }
-        });
-        tbl_patika_list.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mousePressed(MouseEvent e) {
-                Point point = e.getPoint();
-                int selected_row = tbl_patika_list.rowAtPoint(point);
-                tbl_patika_list.setRowSelectionInterval(selected_row,selected_row);
-            }
-        });
-        //ModelPatikaList--
-
         //ModelCourseList
         mdl_course_list = new DefaultTableModel();
-        Object[] col_course_list = {"ID" , "Course Name" ,"Course Lenguage" , "Patika" , "Educator"};
+        Object[] col_course_list = {"ID" , "Kurs Adı" ,"Dil" , "Patika" , "Eğitmen"};
         mdl_course_list.setColumnIdentifiers(col_course_list);
         row_course_list = new Object[col_course_list.length];
         loadCourseModel();
@@ -284,7 +274,7 @@ public class OperatorGUI extends JFrame {
                         Course.deleteByEducatorID(user_id);
                         Contents.deleteByCourseID(Course.getFetchByEducatorID(user_id).getId());
                         Quiz.deleteByCourseID(Course.getFetchByEducatorID(user_id).getId());
-                        loadUserModel(); //tablouu refreshledik
+                        loadUserModel(); 
                         loadEducatorCmbBox();
                         loadCourseModel();
                         loadQuizModel();
