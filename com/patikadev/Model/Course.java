@@ -1,7 +1,6 @@
-package com.patikadev.Model;
+package patika_clone.Model;
 
-import com.patikadev.Helper.DBConnector;
-
+import patika_clone.Helper.DBConnector;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -13,22 +12,30 @@ public class Course {
     private int user_id;
     private int patika_id;
     private String name;
-    private String lang;
+    private String language;
 
     private Patika patika;
     private User educator;
 
-    public Course(int id, int user_id, int patika_id, String name, String lang) {
+    public Course(int id, int user_id, int patika_id, String name, String language) {
         this.id = id;
         this.user_id = user_id;
         this.patika_id = patika_id;
         this.name = name;
-        this.lang = lang;
-
+        this.language = language;
         this.patika = Patika.getFetch(patika_id);
         this.educator = User.getFetch(user_id);
     }
 
+    public Course(int id,int patika_id, String name, String language) {
+        this.id = id;
+        this.patika_id = patika_id;
+        this.name = name;
+        this.language = language;
+    }
+
+    public Course() {
+    }
 
     public int getId() {
         return id;
@@ -63,11 +70,11 @@ public class Course {
     }
 
     public String getLanguage() {
-        return lang;
+        return language;
     }
 
-    public void setLanguage(String lang) {
-        this.lang = lang;
+    public void setLanguage(String language) {
+        this.language = language;
     }
 
     public Patika getPatika() {
@@ -88,190 +95,68 @@ public class Course {
 
     public static ArrayList<Course> getList(){
         ArrayList<Course> courseList = new ArrayList<>();
-        Course obj;
         try {
-            Statement statement = DBConnector.getInstance().createStatement();
-            ResultSet resultSet = statement.executeQuery("SELECT * FROM course");
-            while (resultSet.next()){
-                int id = resultSet.getInt("id");
-                int user_id = resultSet.getInt("user_id");
-                int patika_id = resultSet.getInt("patika_id");
-                String name = resultSet.getString("name");
-                String lang = resultSet.getString("lang");
-
-                obj = new Course(id , user_id , patika_id , name , lang);
+            Statement st = DBConnector.getInstance().createStatement();
+            ResultSet rs = st.executeQuery("SELECT * FROM course");
+            while (rs.next()){
+                int id = rs.getInt("id");
+                int user_id =rs.getInt("user_id");
+                int patika_id = rs.getInt("patika_id");
+                String name = rs.getString("name");
+                String language = rs.getString("language");
+                Course obj = new Course(id,user_id,patika_id,name,language);
                 courseList.add(obj);
             }
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
         }
+
         return courseList;
     }
 
-    public static ArrayList<Course> getListByPatikaID(int patikaID){
-        ArrayList<Course> courseList = new ArrayList<>();
-        Course obj;
+    public static boolean add(int user_id, int patika_id,String name,String language){
+        String  query = " INSERT INTO course (user_id, patika_id,name,language) VALUES (?,?,?,?)";
+
         try {
-            Statement statement = DBConnector.getInstance().createStatement();
-            ResultSet resultSet = statement.executeQuery("SELECT * FROM course WHERE patika_id = " + patikaID);
-            while (resultSet.next()){
-                int id = resultSet.getInt("id");
-                int user_id = resultSet.getInt("user_id");
-                int patika_id = resultSet.getInt("patika_id");
-                String name = resultSet.getString("name");
-                String lang = resultSet.getString("lang");
-
-                obj = new Course(id , user_id , patika_id , name , lang);
-                courseList.add(obj);
-            }
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-        }
-        return courseList;
-    }
-
-
-    public static boolean add(int user_id, int patika_id, String name, String lang){
-        String query = "INSERT INTO course (user_id , patika_id , name , lang) VALUES (?,?,?,?)";
-        try {
-            PreparedStatement preparedStatement = DBConnector.getInstance().prepareStatement(query);
-            preparedStatement.setInt(1, user_id);
-            preparedStatement.setInt(2, patika_id);
-            preparedStatement.setString(3, name);
-            preparedStatement.setString(4, lang);
-            return preparedStatement.executeUpdate() != -1;
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            PreparedStatement pr = DBConnector.getInstance().prepareStatement(query);
+            pr.setInt(1,user_id);
+            pr.setInt(2,patika_id);
+            pr.setString(3,name);
+            pr.setString(4,language);
+            return  pr.executeUpdate() !=-1;
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
         }
         return true;
     }
-
     public static ArrayList<Course> getListByUser(int user_id){
         ArrayList<Course> courseList = new ArrayList<>();
         Course obj;
         try {
-            Statement statement = DBConnector.getInstance().createStatement();
-            ResultSet resultSet = statement.executeQuery("SELECT * FROM course WHERE user_id = " + user_id);
-            while (resultSet.next()){
-                int id = resultSet.getInt("id");
-                int userID = resultSet.getInt("user_id");
-                int patika_id = resultSet.getInt("patika_id");
-                String name = resultSet.getString("name");
-                String lang = resultSet.getString("lang");
-
-                obj = new Course(id , userID , patika_id , name , lang);
+            Statement st = DBConnector.getInstance().createStatement();
+            ResultSet rs = st.executeQuery("SELECT * FROM course WHERE user_id ="+user_id);
+            while (rs.next()){
+                int id = rs.getInt("id");
+                int userID =rs.getInt("user_id");
+                int patika_id = rs.getInt("patika_id");
+                String name = rs.getString("name");
+                String language = rs.getString("language");
+                obj = new Course(id,userID,patika_id,name,language);
                 courseList.add(obj);
             }
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
         }
         return courseList;
     }
-
     public static boolean delete(int id){
-        String query = "DELETE FROM course WHERE id = ?";
+        String query = "DELETE FROM course WHERE id=?";
         try {
-            PreparedStatement preparedStatement = DBConnector.getInstance().prepareStatement(query);
-            preparedStatement.setInt(1,id);
-            return preparedStatement.executeUpdate() != -1;
+            PreparedStatement pr = DBConnector.getInstance().prepareStatement(query);
+            pr.setInt(1,id);
+            return pr.executeUpdate() !=-1;
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            throw new RuntimeException(e);
         }
-        return true;
     }
-
-    public static boolean deleteByPatikaID(int patikaID){
-        String query = "DELETE FROM course WHERE patika_id = ?";
-        try {
-            PreparedStatement preparedStatement = DBConnector.getInstance().prepareStatement(query);
-            preparedStatement.setInt(1,patikaID);
-            return preparedStatement.executeUpdate() != -1;
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-        }
-        return true;
-    }
-
-    public static boolean deleteByEducatorID(int educatorID){
-        String query = "DELETE FROM course WHERE user_id = ?";
-        try {
-            PreparedStatement preparedStatement = DBConnector.getInstance().prepareStatement(query);
-            preparedStatement.setInt(1,educatorID);
-            return preparedStatement.executeUpdate() != -1;
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-        }
-        return true;
-    }
-
-    public static Course getFetch(int id){
-        Course obj = null;
-        String query = "SELECT * FROM course WHERE id=?";
-        try {
-            PreparedStatement preparedStatement = DBConnector.getInstance().prepareStatement(query);
-            preparedStatement.setInt(1 , id);
-            ResultSet resultSet = preparedStatement.executeQuery();
-            if (resultSet.next()){
-                obj = new Course(resultSet.getInt("id") , resultSet.getInt("user_id") ,
-                        resultSet.getInt("patika_id") , resultSet.getString("name"), resultSet.getString("lang"));
-            }
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-        }
-        return obj;
-    }
-
-    public static Course getFetchByEducatorID(int educatorID){
-        Course obj = null;
-        String query = "SELECT * FROM course WHERE user_id=?";
-        try {
-            PreparedStatement preparedStatement = DBConnector.getInstance().prepareStatement(query);
-            preparedStatement.setInt(1 , educatorID);
-            ResultSet resultSet = preparedStatement.executeQuery();
-            if (resultSet.next()){
-                obj = new Course(resultSet.getInt("id") , resultSet.getInt("user_id") ,
-                        resultSet.getInt("patika_id") , resultSet.getString("name"), resultSet.getString("lang"));
-            }
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-        }
-        return obj;
-    }
-
-    public static Course getFetchByPatikaID(int patikaID){
-        Course obj = null;
-        String query = "SELECT * FROM course WHERE patika_id=?";
-        try {
-            PreparedStatement preparedStatement = DBConnector.getInstance().prepareStatement(query);
-            preparedStatement.setInt(1 , patikaID);
-            ResultSet resultSet = preparedStatement.executeQuery();
-            if (resultSet.next()){
-                obj = new Course(resultSet.getInt("id") , resultSet.getInt("user_id") ,
-                        resultSet.getInt("patika_id") , resultSet.getString("name"), resultSet.getString("lang"));
-            }
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-        }
-        return obj;
-    }
-
-
-    public static Course getByPatikaID(int patika_id){
-        Course obj = null;
-        String query = "SELECT * FROM course WHERE patika_id = ?";
-        try {
-            PreparedStatement preparedStatement = DBConnector.getInstance().prepareStatement(query);
-            preparedStatement.setInt(1 , patika_id);
-            ResultSet resultSet = preparedStatement.executeQuery();
-            if (resultSet.next()){
-                obj = new Course(resultSet.getInt("id") , resultSet.getInt("user_id") ,
-                        resultSet.getInt("patika_id") , resultSet.getString("name"), resultSet.getString("lang"));
-            }
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-        }
-        return obj;
-    }
-
-
 }
