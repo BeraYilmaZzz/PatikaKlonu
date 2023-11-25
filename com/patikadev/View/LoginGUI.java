@@ -52,6 +52,7 @@ public class LoginGUI extends JFrame{
 
         btn_student_register.addActionListener(e -> {
             RegisterGUI registerGui = new RegisterGUI();
+            dispose();
         });
     }
 
