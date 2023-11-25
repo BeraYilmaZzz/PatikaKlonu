@@ -3,7 +3,6 @@ package com.patikadev.View;
 import com.patikadev.Helper.Config;
 import com.patikadev.Helper.Helper;
 import com.patikadev.Model.User;
-
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -20,13 +19,12 @@ public class RegisterGUI extends JFrame{
 
     public RegisterGUI(){
         add(wrapper);
-        setSize(400,400);
+        setSize(500,300);
         setLocation(Helper.screenCenterPoint("x",getSize()) , Helper.screenCenterPoint("y" , getSize()));
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setTitle(Config.PROJECT_TITLE);
         setResizable(false);
         setVisible(true);
-
 
         btn_register.addActionListener(e -> {
             if (Helper.isFieldEmpty(fld_register_name) || Helper.isFieldEmpty(fld_register_uname) || Helper.isFieldEmpty(fld_register_pass)){
@@ -40,14 +38,15 @@ public class RegisterGUI extends JFrame{
                     User.add(fld_register_name.getText() , fld_register_uname.getText() , fld_register_pass.getText() , "student");
                     Helper.showMsg("done");
                 }
-
             }
             LoginGUI loginGUI = new LoginGUI();
             dispose();
         });
+        
         btn_register_logout.addActionListener(e -> {
             dispose();
             LoginGUI loginGUI = new LoginGUI();
         });
+        
     }
 }
