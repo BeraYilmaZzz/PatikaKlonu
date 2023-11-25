@@ -1,59 +1,83 @@
-package com.patikadev.View;
+package patika_clone.View;
 
-import com.patikadev.Helper.Config;
-import com.patikadev.Helper.Helper;
-import com.patikadev.Model.*;
-
+import patika_clone.Helper.Config;
+import patika_clone.Helper.Helper;
+import patika_clone.Model.Operator;
+import patika_clone.Model.User;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class LoginGUI extends JFrame{
+public class LoginGUI extends  JFrame{
     private JPanel wrapper;
     private JPanel wtop;
     private JPanel wbottom;
-    private JTextField fld_user_name;
-    private JTextField fld_user_pass;
-    private JButton btn_login;
-    private JButton btn_student_register;
+    public  JTextField field_user_username_pb;
+    public JPasswordField field_user_password_pb;
+    private JButton button_login;
+    private JTextField field_signup_name;
+    private JTextField field_signup_username;
+    private JPasswordField field_signup_password;
+    private JButton signUpButton;
+
 
     public LoginGUI(){
         add(wrapper);
-        setSize(600,500);
-        setLocation(Helper.screenCenterPoint("x",getSize()) , Helper.screenCenterPoint("y" , getSize()));
+        setSize(500,700);
+        setLocation(Helper.screenCenter("x",getSize()),Helper.screenCenter("y",getSize()));
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setTitle(Config.PROJECT_TITLE);
-        setResizable(false);
         setVisible(true);
-        btn_login.addActionListener(e -> {
-            if(Helper.isFieldEmpty(fld_user_name) || Helper.isFieldEmpty(fld_user_pass)){
+        setResizable(false);
+
+        button_login.addActionListener(e -> {
+            if (Helper.isFieldEmpty(field_user_username_pb)|| Helper.isFieldEmpty(field_user_password_pb)){
                 Helper.showMsg("fill");
             }else {
-                User user = User.getFetch(fld_user_name.getText() , fld_user_pass.getText());
-                if (user == null){
-                    Helper.showMsg("User not found!");
+                User u = User.getFetch(field_user_username_pb.getText(),field_user_password_pb.getText());
+                if (u == null){
+                    Helper.showMsg("Wrong username or password !");
                 }else {
-                    switch (user.getType()){
-                        case "operator" :
-                            OperatorGUI operatorGUI = new OperatorGUI(new Operator(user.getId() ,user.getName(), user.getUname(), user.getPass(),user.getType()));
+                    switch (u.getType()){
+                        case "operator":
+                        OperatorGUI opGUI = new OperatorGUI((Operator) u,u.getId());
                             break;
-                        case "educator" :
-                            EducatorGUI educatorGUI = new EducatorGUI(new Educator(user.getId() ,user.getName(), user.getUname(), user.getPass(),user.getType()));
+                        case "educator":
+                            EducatorGUI edGUI = new EducatorGUI(u.getId());
                             break;
-                        case "student" :
-                            StudentGUI studentGUI = new StudentGUI(new Student(user.getId() ,user.getName(), user.getUname(), user.getPass(),user.getType()));
+                        case "student":
+                            StudenGUI stGUI = new StudenGUI(u.getId());
                             break;
                     }
                     dispose();
                 }
-            }
-        });
 
-        btn_student_register.addActionListener(e -> {
-            RegisterGUI registerGui = new RegisterGUI();
-            dispose();
+            }
+
         });
+        signUpButton.addActionListener(e -> {
+            boolean u = User.signUp(field_signup_name.getText().toString(),field_signup_username.getText().toString(),field_signup_password.getText().toString(),"student");
+            field_signup_name.setText(null);
+            field_signup_username.setText(null);
+            field_signup_password.setText(null);
+            Helper.showMsg("Signed Up!");
+        });
+    }
+     public JTextField getField_user_username_pb() {
+        return field_user_username_pb;
+    }
+
+    public void setField_user_username_pb(JTextField field_user_username_pb) {
+        this.field_user_username_pb = field_user_username_pb;
+    }
+
+    public JPasswordField getField_user_password_pb() {
+        return field_user_password_pb;
+    }
+
+    public void setField_user_password_pb(JPasswordField field_user_password_pb) {
+        this.field_user_password_pb = field_user_password_pb;
     }
 
     public static void main(String[] args) {
